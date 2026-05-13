@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bloque vs Linea - Guia Visual</title>
+    <sytle>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px; auto;
+            max-width: 800px;
+            color: #333;
+        }
+
+        /* Estilos para elementos de bloque */
+        .ejemplo-bloque {
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        /* Estilos para elementos en linea */
+        .ejemplo-linea {
+            color: #007BFF;
+            text-decoration: none;
+            padding: 5px 10px;
+            border: 1px solid #007BFF;
+            border-radius: 4px;
+        }
+
+        Hr { border: 0; border-top: 1px solid #ccc; margin: 20px 0; }
+        code { background-color: #f9f9f9; padding: 2px 4px; border-radius: 4px; }
+    </sytle>
+</head>
+<body>
+    <h1>Guia de flujo HTML</h1>
+
+    <section>
+        <h2>2. Elementos en linea (<code>display: inline</code></h2>
+        <p>Observa como estos elementos fluyen <strong>dentro del texto</strong> y solo ocupan el ancho de su contenido:
+        </p>
+
+        <p>
+            En este parrafo, tenemos un
+            <span class="ejemplo-inline">span azul</span>,
+            seguido inmediatamente por otro
+            <span class="ejemplo inline">segundo <span></span>.
+
+
+        </p>
+
+        <p><em>Conclusion:</em> No rompen el flujo, se quedan al lado de sus vecinos.</p>
+
+    </section>
+
+    <hr>
+
+    <section>
+        <h2>3. Comparacion Visual Final </h2>
+
+        <div class="ejemplo-bloque">
+            Soy un bloque. Si intentas poner un
+            <span class="ejemplo-inline">elemento en linea</span>
+            aqui, se quedara al lado de mi texto, pero yo seguire ocupando toda
+        </div>
+
+        <p>
+            Texto normal...
+            <span class="ejemplo-inline">Soy Inline</span>
+            <div class="ejemplo-bloque">¡Cuidado! Soy un bloque apareciendo de la nada. He forazado un salto de linea.</div>
+            ... el texto continua despues del bloque.
+        </p>
+    </section>
+</body>
+</html>
