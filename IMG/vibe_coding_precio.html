@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recibo Green & Blue Aquamarine</title>
+<style>
+  /* =============================================
+     CSS VARIABLES
+  ============================================= */
+  :root {
+    --paper-bg: #dff0f5;
+    --border-blue: #2a6fa8;
+    --border-blue-light: #4a90c4;
+    --text-green: #2e7d32;
+    --text-green-logo: #388e3c;
+    --text-blue: #1a4f7a;
+    --text-blue-dark: #0d3a5c;
+    --receipt-red: #c0392b;
+    --line-color: #3a7fc1;
+    --input-line: #3a7fc1;
+    --shadow-color: rgba(0, 0, 0, 0.28);
+    --paper-width: 210mm;
+    --paper-height: 148mm;
+  }
+
+  /* =============================================
+     RESET & BASE
+  ============================================= */
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: 'Courier New', Courier, monospace;
+    background: #b0bec5;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 30px 15px;
+    background-image: repeating-linear-gradient(
+      45deg,
+      rgba(0,0,0,0.03) 0px,
+      rgba(0,0,0,0.03) 1px,
+      transparent 1px,
+      transparent 8px
+    );
+  }
+
+  /* =============================================
+     PAPER CONTAINER
+  ============================================= */
+  .paper {
+    width: var(--paper-width);
+    min-height: var(--paper-height);
+    background-color: var(--paper-bg);
+    box-shadow:
+      0 2px 6px var(--shadow-color),
+      0 8px 28px rgba(0,0,0,0.22),
+      inset 0 0 0 1px rgba(255,255,255,0.35);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: row;
+  }
+
+  /* Subtle paper grain texture */
+  .paper::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  /* =============================================
+     RECEIPT NUMBER — VERTICAL STRIP (right side)
+  ============================================= */
+  .receipt-number-strip {
+    width: 22px;
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: 6px;
+    flex-shrink: 0;
+    border-left: 1.5px solid var(--border-blue);
+    position: relative;
+  }
+
+  .receipt-label {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    transform: rotate(180deg);
+    color: var(--receipt-red);
+    font-weight: 900;
+    font-size: 7.5pt;
+    font-family: 'Arial Black', Arial, sans-serif;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .receipt-no-box {
+    border: 1.5px solid var(--receipt-red);
+    background: white;
+    padding: 2px 2px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 2px;
+    width: 18px;
+  }
+
+  .receipt-no-label {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    color: var(--receipt-red);
+    font-size: 6pt;
+    font-weight: bold;
+    font-family: Arial, sans-serif;
+    letter-spacing: 0.5px;
+  }
+
+  .receipt-no-value {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    color: var(--receipt-red);
+    font-size: 8pt;
+    font-weight: 900;
+    font-family: 'Arial Black', Arial, sans-serif;
+    border: none;
+    background: transparent;
+    width: 100%;
+    text-align: center;
+    outline: none;
+    cursor: text;
+  }
+
+  /* =============================================
+     MAIN CONTENT
+  ============================================= */
+  .main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 6px 8px 6px 8px;
+    border: 1.5px solid var(--border-blue);
+    margin: 5px 0 5px 5px;
+    position: relative;
+  }
+
+  /* =============================================
+     HEADER ROW
+  ============================================= */
+  .header-row {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    border-bottom: 1.5px solid var(--border-blue);
+    padding-bottom: 5px;
+    margin-bottom: 4px;
+  }
+
+  /* Logo Block */
+  .logo-block {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding-right: 10px;
+    border-right: 1.5px solid var(--border-blue);
+    margin-right: 10px;
+  }
+
+  .logo-green-blue {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1px;
+    line-height: 1;
+  }
+
+  .logo-green {
+    font-family: 'Arial Black', Impact, sans-serif;
+    font-size: 16pt;
+    font-weight: 900;
+    color: var(--text-green-logo);
+    letter-spacing: -0.5px;
+    text-transform: uppercase;
+  }
+
+  .logo-ampersand {
+    font-size: 10pt;
+    color: var(--text-green-logo);
+    font-weight: 900;
+    margin: 0 1px;
+  }
+
+  .logo-blue {
+    font-family: 'Arial Black', Impact, sans-serif;
+    font-size: 16pt;
+    font-weight: 900;
+    color: var(--text-blue);
+    letter-spacing: -0.5px;
+    text-transform: uppercase;
+  }
+
+  .logo-sub {
+    font-family: 'Brush Script MT', 'Comic Sans MS', cursive;
+    font-size: 11pt;
+    color: var(--text-blue);
+    font-style: italic;
+    letter-spacing: 1px;
+    margin-top: -2px;
+    padding-left: 2px;
+  }
+
+  .logo-tagline {
+    font-size: 5.5pt;
+    color: var(--text-blue-dark);
+    font-style: italic;
+    margin-top: 2px;
+    white-space: nowrap;
+    letter-spacing: 0.2px;
+  }
+
+  /* Header right: service type + dates */
+  .header-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .service-types {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 6px 12px;
+    margin-bottom: 3px;
+  }
+
+  .service-item {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 6.5pt;
+    font-weight: bold;
+    color: var(--text-blue-dark);
+    font-family: Arial, sans-serif;
+    text-transform: uppercase;
+  }
+
+  .service-item input[type="checkbox"] {
+    width: 8px;
+    height: 8px;
+    accent-color: var(--text-blue);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  /* Dates row */
+  .dates-contact-row {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .date-group {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .date-item {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 6pt;
+    font-weight: bold;
+    color: var(--text-blue-dark);
+    font-family: Arial, sans-serif;
+    white-space: nowrap;
+  }
+
+  .date-item span {
+    text-transform: uppercase;
+    font-size: 5.5pt;
+  }
+
+  .contact-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    margin-left: auto;
+    text-align: right;
+    font-size: 5.5pt;
+    color: var(--text-blue-dark);
+    font-family: Arial, sans-serif;
+    line-height: 1.5;
+  }
+
+  .contact-info .phone-icon {
+    color: var(--text-green);
+    font-weight: bold;
+  }
+
+  /* =============================================
+     INPUT FIELDS (shared styles)
+  ============================================= */
+  .field-input {
+    border: none;
+    border-bottom: 1px solid var(--input-line);
+    background: transparent;
+    outline: none;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 7pt;
+    color: #111;
+    padding: 0 1px 1px 1px;
+    min-width: 30px;
+    line-height: 1.2;
+  }
+
+  .field-input:focus {
+    background: rgba(255,255,255,0.5);
+    border-bottom-color: var(--text-blue);
+  }
+
+  /* =============================================
+     PERSON ROW
+  ============================================= */
+  .person-row {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    gap: 6px;
+    margin-bottom: 3px;
+    border-bottom: 1px solid var(--border-blue-light);
+    padding-bottom: 3px;
+  }
+
+  .field-label {
+    font-size: 6.5pt;
+    font-weight: bold;
+    color: var(--text-blue-dark);
+    font-family: Arial, sans-serif;
+    white-space: nowrap;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+
+  .field-label.green {
+    color: var(--text-green);
+  }
+
+  .input-grow {
+    flex: 1;
+  }
+
+  /* =============================================
+     DETAILS ROW (Ciudad, Edad, Peso, Talla)
+  ============================================= */
+  .details-row {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    gap: 8px;
+    margin-bottom: 3px;
+    border-bottom: 1px solid var(--border-blue-light);
+    padding-bottom: 3px;
+  }
+
+  .detail-field {
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+  }
+
+  /* =============================================
+     PHONE + DIRECTION ROW
+  ============================================= */
+  .phone-dir-row {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    gap: 6px;
+    margin-bottom: 3px;
+    border-bottom: 1px solid var(--border-blue-light);
+    padding-bottom: 3px;
+  }
+
+  /* =============================================
+     BODY: DESCRIPCION + OBSERVACIONES
+  ============================================= */
+  .body-section {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    gap: 0;
+    border: 1.5px solid var(--border-blue);
+    min-height: 50mm;
+  }
+
+  /* Description column */
+  .description-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    border-right: 1.5px solid var(--border-blue);
+  }
+
+  .col-header {
+    font-size: 7pt;
+    font-weight: 900;
+    color: var(--text-blue-dark);
+    font-family: Arial, sans-serif;
+    text-transform: uppercase;
+    text-align: center;
+    padding: 2px 4px;
+    border-bottom: 1px solid var(--border-blue);
+    letter-spacing: 1px;
+    background: rgba(42, 111, 168, 0.06);
+  }
+
+  .col-header.green {
+    color: var(--text-green);
+  }
+
+  .description-textarea {
+    flex: 1;
+    border: none;
+    background: transparent;
+    resize: none;
+    outline: none;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 7pt;
+    color: #111;
+    padding: 4px 6px;
+    width: 100%;
+  }
+
+  /* Observations column */
+  .observations-col {
+    width: 42mm;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .observations-textarea {
+    flex: 1;
+    border: none;
+    background: transparent;
+    resize: none;
+    outline: none;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 7pt;
+    color: #111;
+    padding: 4px 5px;
+    width: 100%;
+  }
+
+  /* =============================================
+     BOTTOM SECTION: TOTAL + PPL + VR TOTAL + FIRMAS
+  ============================================= */
+  .bottom-section {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    border: 1.5px solid var(--border-blue);
+    border-top: none;
+    min-height: 22mm;
+  }
+
+  /* Firma Instructor */
+  .firma-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 4px 6px;
+    border-right: 1px solid var(--border-blue-light);
+  }
+
+  .firma-line {
+    border-top: 1px solid var(--border-blue);
+    margin-bottom: 2px;
+  }
+
+  .firma-label {
+    font-size: 5.5pt;
+    font-weight: bold;
+    color: var(--text-green);
+    font-family: Arial, sans-serif;
+    text-transform: uppercase;
+    text-align: center;
+    letter-spacing: 0.5px;
+  }
+
+  /* Totals column */
+  .totals-col {
+    width: 42mm;
+    display: flex;
+    flex-direction: column;
+    border-left: 1.5px solid var(--border-blue);
+  }
+
+  .total-row-box {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    border-bottom: 1px solid var(--border-blue-light);
+    min-height: 8mm;
+  }
+
+  .total-label-box {
+    background: rgba(42, 111, 168, 0.08);
+    font-size: 6.5pt;
+    font-weight: 900;
+    color: var(--text-blue-dark);
+    font-family: Arial, sans-serif;
+    text-transform: uppercase;
+    padding: 2px 5px;
+    border-right: 1px solid var(--border-blue-light);
+    white-space: nowrap;
+    min-width: 16mm;
+    text-align: center;
+    letter-spacing: 0.5px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .total-value-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    outline: none;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 7pt;
+    color: #111;
+    padding: 2px 4px;
+    text-align: right;
+  }
+
+  .ppl-row {
+    display: flex;
+    flex-direction: row;
+    min-height: 7mm;
+    border-bottom: 1px solid var(--border-blue-light);
+  }
+
+  .ppl-label {
+    font-size: 5.5pt;
+    font-weight: bold;
+    color: var(--text-blue-dark);
+    font-family: Arial, sans-serif;
+    text-transform: uppercase;
+    padding: 2px 4px;
+    border-right: 1px solid var(--border-blue-light);
+    display: flex;
+    align-items: center;
+    min-width: 10mm;
+    justify-content: center;
+  }
+
+  .ppl-value-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    outline: none;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 7pt;
+    color: #111;
+    padding: 2px 4px;
+  }
+
+  .vr-total-row {
+    display: flex;
+    flex-direction: row;
+    min-height: 7mm;
+  }
+
+  /* =============================================
+     DATE INPUTS in header
+  ============================================= */
+  .date-box {
+    border: 1px solid var(--border-blue);
+    background: white;
+    width: 18mm;
+    height: 8px;
+    display: inline-block;
+    font-size: 6pt;
+    outline: none;
+    font-family: 'Courier New', Courier, monospace;
+    padding: 1px 2px;
+    color: #111;
+  }
+
+  /* =============================================
+     PRINT STYLES
+  ============================================= */
+  @media print {
+    @page {
+      size: A5 landscape;
+      margin: 5mm;
+    }
+
+    body {
+      background: white !important;
+      padding: 0;
+      min-height: unset;
+    }
+
+    .paper {
+      box-shadow: none !important;
+      width: 200mm;
+      min-height: 138mm;
+    }
+
+    * {
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+      color-adjust: exact !important;
+    }
+
+    .field-input:focus,
+    .description-textarea:focus,
+    .observations-textarea:focus,
+    .total-value-input:focus,
+    .ppl-value-input:focus {
+      background: transparent;
+    }
+  }
+
+  /* =============================================
+     PRINT BUTTON (no print)
+  ============================================= */
+  .print-btn {
+    display: block;
+    margin: 16px auto 0 auto;
+    padding: 8px 28px;
+    background: var(--border-blue);
+    color: white;
+    border: none;
+    border-radius: 3px;
+    font-size: 10pt;
+    cursor: pointer;
+    font-family: Arial, sans-serif;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    transition: background 0.2s;
+  }
+
+  .print-btn:hover {
+    background: var(--text-blue-dark);
+  }
+
+  @media print {
+    .print-btn { display: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="paper">
+
+  <!-- =============================================
+       MAIN CONTENT AREA
+  ============================================= -->
+  <div class="main-content">
+
+    <!-- HEADER -->
+    <div class="header-row">
+
+      <!-- LOGO -->
+      <div class="logo-block">
+        <div class="logo-green-blue">
+          <span class="logo-green">GREEN</span>
+          <span class="logo-ampersand">&amp;</span>
+          <span class="logo-blue">BLUE</span>
+        </div>
+        <div class="logo-sub">aquamarine</div>
+        <div class="logo-tagline">Efecto y prevención en la funcionalidad física</div>
+      </div>
+
+      <!-- SERVICE TYPES + DATES -->
+      <div class="header-right">
+
+        <!-- Services -->
+        <div class="service-types">
+          <label class="service-item">
+            <input type="checkbox" name="servicio" value="rehabilitacion">
+            REHABILITACIÓN
+          </label>
+          <label class="service-item">
+            <input type="checkbox" name="servicio" value="entrenamiento">
+            ENTRENAMIENTO
+          </label>
+          <label class="service-item">
+            <input type="checkbox" name="servicio" value="masajes">
+            MASAJES
+          </label>
+          <label class="service-item">
+            <input type="checkbox" name="servicio" value="natacion">
+            NATACIÓN
+          </label>
+        </div>
+
+        <!-- Dates + Contact -->
+        <div class="dates-contact-row">
+          <div class="date-group">
+            <div class="date-item">
+              <span>Fecha Inicio</span>
+              <input type="text" class="date-box field-input" style="width:20mm;" placeholder="____/__/__">
+            </div>
+            <div class="date-item">
+              <span>Fecha Finalización</span>
+              <input type="text" class="date-box field-input" style="width:20mm;" placeholder="____/__/__">
+            </div>
+          </div>
+
+          <div class="contact-info">
+            <div><span class="phone-icon">©</span> 318 868 8008 / 310 740 6038</div>
+            <div style="margin-top:1px;font-size:5pt;color:var(--text-blue);">Dirección:</div>
+            <input type="text" class="field-input" style="width:36mm;font-size:5.5pt;" placeholder="&nbsp;">
+          </div>
+        </div>
+
+      </div><!-- /.header-right -->
+    </div><!-- /.header-row -->
+
+    <!-- SEÑOR(ES) ROW -->
+    <div class="person-row">
+      <span class="field-label green">Señor (es):</span>
+      <input type="text" class="field-input input-grow" placeholder="">
+      <span class="field-label" style="margin-left:8px;">Teléfono:</span>
+      <input type="text" class="field-input" style="width:28mm;" placeholder="">
+    </div>
+
+    <!-- CIUDAD / EDAD / PESO / TALLA -->
+    <div class="details-row">
+      <div class="detail-field" style="flex:1;">
+        <span class="field-label">Ciudad:</span>
+        <input type="text" class="field-input input-grow" placeholder="" style="flex:1;margin-left:2px;">
+      </div>
+      <div class="detail-field">
+        <span class="field-label">Edad:</span>
+        <input type="text" class="field-input" style="width:14mm;" placeholder="">
+      </div>
+      <div class="detail-field">
+        <span class="field-label">Peso:</span>
+        <input type="text" class="field-input" style="width:14mm;" placeholder="">
+      </div>
+      <div class="detail-field">
+        <span class="field-label">Talla:</span>
+        <input type="text" class="field-input" style="width:14mm;" placeholder="">
+      </div>
+    </div>
+
+    <!-- DESCRIPCION + OBSERVACIONES + TOTALS -->
+    <div class="body-section">
+
+      <!-- DESCRIPCIÓN -->
+      <div class="description-col">
+        <div class="col-header">Descripción</div>
+        <textarea class="description-textarea" placeholder=""></textarea>
+      </div>
+
+      <!-- OBSERVACIONES -->
+      <div class="observations-col">
+        <div class="col-header green">Observaciones</div>
+        <textarea class="observations-textarea" placeholder=""></textarea>
+      </div>
+
+    </div><!-- /.body-section -->
+
+    <!-- BOTTOM: FIRMAS + TOTALES -->
+    <div class="bottom-section">
+
+      <!-- FIRMA INSTRUCTOR -->
+      <div class="firma-col">
+        <div style="flex:1;"></div>
+        <div class="firma-line"></div>
+        <div class="firma-label">Firma del Instructor</div>
+      </div>
+
+      <!-- FIRMA USUARIO -->
+      <div class="firma-col">
+        <div style="flex:1;"></div>
+        <div class="firma-line"></div>
+        <div class="firma-label">Firma del Usuario</div>
+      </div>
+
+      <!-- TOTALS -->
+      <div class="totals-col">
+
+        <!-- TOTAL -->
+        <div class="total-row-box">
+          <div class="total-label-box">Total</div>
+          <span style="padding:0 3px;font-size:7pt;font-weight:bold;color:var(--text-blue-dark);font-family:Arial;">$</span>
+          <input type="text" class="total-value-input" placeholder="">
+        </div>
+
+        <!-- PPL -->
+        <div class="ppl-row">
+          <div class="ppl-label">PPL:</div>
+          <input type="text" class="ppl-value-input" placeholder="">
+        </div>
+
+        <!-- VR. TOTAL -->
+        <div class="vr-total-row">
+          <div class="ppl-label" style="min-width:auto;padding:2px 4px;font-size:5.5pt;">VR. TOTAL</div>
+          <input type="text" class="ppl-value-input" placeholder="">
+        </div>
+
+      </div><!-- /.totals-col -->
+
+    </div><!-- /.bottom-section -->
+
+  </div><!-- /.main-content -->
+
+  <!-- =============================================
+       RECEIPT NUMBER STRIP (right side)
+  ============================================= -->
+  <div class="receipt-number-strip">
+    <div class="receipt-label">Recibo</div>
+    <div class="receipt-no-box">
+      <div class="receipt-no-label">N°</div>
+      <input
+        type="text"
+        class="receipt-no-value"
+        value="0478"
+        maxlength="6"
+        style="width:14px;height:28px;"
+      >
+    </div>
+  </div>
+
+</div><!-- /.paper -->
+
+<button class="print-btn" onclick="window.print()">🖨 Imprimir Recibo</button>
+
+</body>
+</html>
